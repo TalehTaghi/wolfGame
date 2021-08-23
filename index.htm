@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+        integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <title>Man&Wolf</title>
+
+    <style>
+        * {
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-image: url('bg.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            color: darkblue;
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        #score {
+            background-color: black;
+            color: white;
+            position: absolute;
+            padding: 5px 20px;
+            font-size: 20px;
+            top: 5px;
+            right: 25px;
+        }
+
+        i {
+            color: red;
+        }
+
+        .incr {
+            color: green;
+        }
+
+        .decr {
+            color: red;
+        }
+
+        #buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        button {
+            margin-left: 10px;
+            background-color: darkred;
+            border-radius: 5px;
+            border: solid 1px black;
+            padding: 10px 20px;
+            color: white;
+            font: bold 16px 'Arial', 'sans-serif';
+            cursor: pointer;
+        }
+
+        #result {
+            text-align: center;
+            width: 300px;
+            display: block;
+            margin: auto;
+            border-radius: 5px;
+        }
+
+        p {
+            background-color: darkred;
+            color: white;
+            font: bold 30px 'Arial', 'sans-serif';
+        }
+
+        #again {
+            cursor: pointer;
+        }
+
+        .fa-redo-alt {
+            color: white;
+            font-size: 28px;
+        }
+
+        #wolf {
+            width: 320px;
+            height: 230px;
+            background-image: url('wolf.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 380px;
+            left: 10%;
+        }
+
+        #man {
+            width: 300px;
+            height: 420px;
+            background-image: url('man.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 220px;
+            right: 20%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Man&Wolf</h1>
+
+    <div id="score">
+        User: {{userLife}} <i class="fas fa-heart"> <span class="incr" v-if="increase">+{{increase}}</span> <span
+                class="decr" v-if="decreaseMan">-{{decreaseMan}}</span></i>
+        <br />
+        Wolf: {{wolfLife}} <i class="fas fa-heart"> <span class="decr" v-if="decreaseWolf">-{{decreaseWolf}}</span></i>
+    </div>
+
+    <div id="buttons" v-if="show">
+        <button @click="attack()">Attack</button>
+        <button @click="strongAttack()">Strong attack</button>
+        <button @click="heal()">Heal</button>
+    </div>
+
+    <div id="result">
+        <p v-if="userDied()">You have died!</p>
+        <p v-if="wolfDied()">Wolf has died!</p>
+        <p id="again" v-if="againPlay" @click="playAgain()">Play Again <i class="fas fa-redo-alt"></i></p>
+    </div>
+
+    <div id="wolf"></div>
+    <div id="man"></div>
+
+
+
+    <script>
+        let tmout = 0;
+
+        let lives = new Vue({
+            el: "#score",
+
+            data: {
+                userLife: 100,
+                wolfLife: 100,
+                increase: 0,
+                decreaseMan: 0,
+                decreaseWolf: 0
+            },
+        })
+
+        let buttons = new Vue({
+            el: "#buttons",
+
+            data: {
+                show: true,
+            },
+
+            methods: {
+                attack: function () {
+                    if (tmout) 
+                    {
+                        lives.increase = 0;
+                        lives.decreaseMan = 0;
+                        lives.decreaseWolf = 0;
+                        clearInterval(tmout);
+                    }
+
+                    lives.decreaseMan = Math.floor(Math.random() * 10 + 1);
+                    lives.decreaseWolf = Math.floor(Math.random() * 10 + 1);
+
+                    lives.userLife -= lives.decreaseMan;
+                    lives.wolfLife -= lives.decreaseWolf;
+
+                    lives.userLife = lives.userLife <= 0 ? 0 : lives.userLife;
+                    lives.wolfLife = lives.wolfLife <= 0 ? 0 : lives.wolfLife;
+
+                    tmout = setTimeout(() => {
+                        lives.increase = 0;
+                        lives.decreaseMan = 0;
+                        lives.decreaseWolf = 0;
+                    }, 1000);
+
+                    this.isGameOver();
+                },
+
+                strongAttack: function () {
+                    if (tmout) 
+                    {
+                        lives.increase = 0;
+                        lives.decreaseMan = 0;
+                        lives.decreaseWolf = 0;
+                        clearInterval(tmout);
+                    }
+
+                    lives.decreaseMan = Math.floor(Math.random() * 25 + 1);
+                    lives.decreaseWolf = Math.floor(Math.random() * 25 + 1);
+
+                    lives.userLife -= lives.decreaseMan;
+                    lives.wolfLife -= lives.decreaseWolf;
+
+                    lives.userLife = lives.userLife <= 0 ? 0 : lives.userLife;
+                    lives.wolfLife = lives.wolfLife <= 0 ? 0 : lives.wolfLife;
+
+                    tmout = setTimeout(() => {
+                        lives.increase = 0;
+                        lives.decreaseMan = 0;
+                        lives.decreaseWolf = 0;
+                    }, 1000);
+
+                    this.isGameOver();
+                },
+
+                heal: function () {
+                    if (tmout) 
+                    {
+                        lives.increase = 0;
+                        lives.decreaseMan = 0;
+                        lives.decreaseWolf = 0;
+                        clearInterval(tmout);
+                    }
+
+                    lives.increase =  Math.floor(Math.random() * 15 + 1);
+                    lives.decreaseMan = Math.floor(Math.random() * 15 + 1);
+
+                    lives.userLife += lives.increase - lives.decreaseMan;
+
+                    lives.userLife = lives.userLife <= 0 ? 0 : lives.userLife;
+                    lives.userLife = lives.userLife > 100 ? 100 : lives.userLife;
+
+                    tmout = setTimeout(() => {
+                        lives.increase = 0;
+                        lives.decreaseMan = 0;
+                        lives.decreaseWolf = 0;
+                    }, 1000);
+
+                    this.isGameOver();
+                },
+
+                isGameOver: function () {
+                    if (lives.userLife == 0 || lives.wolfLife == 0) {
+                        this.show = !this.show;
+                        results.againPlay = !results.againPlay;
+                    }
+                }
+            }
+        })
+
+        let results = new Vue({
+            el: "#result",
+
+            data: {
+                againPlay: false
+            },
+
+            methods: {
+                userDied: function () {
+                    if (lives.userLife == 0) {
+                        return true;
+                    }
+                },
+
+                wolfDied: function () {
+                    if (lives.wolfLife == 0) {
+                        return true;
+                    }
+                },
+
+                playAgain: function () {
+                    lives.userLife = 100;
+                    lives.wolfLife = 100;
+                    buttons.show = !buttons.show;
+                    this.againPlay = !this.againPlay;
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
